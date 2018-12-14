@@ -1,4 +1,3 @@
-'use strict';
 
 const del = require(`del`);
 const gulp = require(`gulp`);
@@ -11,6 +10,11 @@ const mqpacker = require(`css-mqpacker`);
 const minify = require(`gulp-csso`);
 const rename = require(`gulp-rename`);
 const imagemin = require(`gulp-imagemin`);
+const svgstore = require(`gulp-svgstore`);
+const rollup = require(`gulp-better-rollup`);
+const sourcemaps = require(`gulp-sourcemaps`);
+const mocha = require(`gulp-mocha`);
+const commonjs = require(`rollup-plugin-commonjs`);
 
 gulp.task(`style`, () => {
   return gulp.src(`sass/style.scss`).
@@ -35,6 +39,14 @@ gulp.task(`style`, () => {
     pipe(gulp.dest(`build/css`));
 });
 
+gulp.task(`sprite`, () => {
+  return gulp.src(`img/sprite/*.svg`)
+  .pipe(svgstore({
+    inlineSvg: true
+  }))
+  .pipe(rename(`sprite.svg`))
+  .pipe(gulp.dest(`build/img`));
+});
 gulp.task(`scripts`, () => {
   return gulp.src(`js/**/*.js`).
     pipe(plumber()).
@@ -57,7 +69,7 @@ gulp.task(`copy-html`, () => {
     pipe(server.stream());
 });
 
-gulp.task(`copy`, [`copy-html`, `scripts`, `style`], () => {
+gulp.task(`copy`, [`copy-html`, `scripts`, `style`, `sprite`], () => {
   return gulp.src([
     `fonts/**/*.{woff,woff2}`,
     `img/*.*`
@@ -100,5 +112,23 @@ gulp.task(`build`, [`assemble`], () => {
   gulp.start(`imagemin`);
 });
 
-gulp.task(`test`, () => {
+gulp.task(`test`, function () {
+  return gulp
+  .src([`js/**/*.test.js`])
+  .pipe(rollup({
+    plugins: [
+      commonjs()
+    ]}, `cjs`))
+  .pipe(gulp.dest(`build/test`))
+  .pipe(mocha({
+    reporter: `spec`
+  }));
+});
+gulp.task(`scripts`, () => {
+  return gulp.src(`js/main.js`)
+    .pipe(plumber())
+    .pipe(sourcemaps.init())
+    .pipe(rollup({}, `iife`))
+    .pipe(sourcemaps.write(``))
+    .pipe(gulp.dest(`build/js`));
 });
