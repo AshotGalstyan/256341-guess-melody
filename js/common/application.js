@@ -29,14 +29,24 @@ export default class Application {
   }
 
   static playGame() {
-
+    /*
     const audios = Object.keys(this.mediaFiles);
 
     var audio = new Audio(audios[0]);
     audio.play();
+    */
 
 
     changeScreen(mainElement, `End Loading. screenplay length: ` + this.screenplay.length);
+    console.log(JSON.stringify(this.screenplay));
+
+    Object.keys(this.mediaFiles).forEach((url) => {
+      if (this.mediaFiles[url].type === `img`) {
+        console.log(`>> ` + url);
+        console.log(JSON.stringify(this.mediaFiles[url].size));
+      }
+    });
+
   }
   /*
   static showGreeting() {

@@ -1,5 +1,5 @@
 export const DEBUG = true;
-export const UPLOAD_ARTIST_THUMBNAIL = false;
+export const UPLOAD_ARTIST_THUMBNAIL = true;
 
 export const SERVER_URL = `https://es.dump.academy/guess-melody/`;
 export const DEFAULT_NAME = `assa`;

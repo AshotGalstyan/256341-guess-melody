@@ -46,30 +46,38 @@ const convertServerData = (data) => {
         if (!(allowedGenres.includes(answer.genre))) {
           throw new Error(`Произошла ошибка (код - 04)`);
         }
-        mediaFiles[answer.src] = MediaFileType.AUDIO;
+        mediaFiles[answer.src] = {type: MediaFileType.AUDIO};
       }
     } else {
 
-      mediaFiles[step.src] = MediaFileType.AUDIO;
+      mediaFiles[step.src] = {type: MediaFileType.AUDIO};
 
       if (UPLOAD_ARTIST_THUMBNAIL) {
         for (const answer of step.answers) {
-          mediaFiles[answer.image.url] = MediaFileType.IMG;
+          mediaFiles[answer.image.url] = {type: MediaFileType.IMG};
         }
       }
     }
   }
 
-  return {screenplay: data, mediaFiles};
+  return {screenplay: data, mediaFiles: mediaFiles};
 
 };
 
-const loadMediaFile = (url) => {
+const loadMediaFile = (url, type) => {
   return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.addEventListener(`load`, () => resolve(image));
-    image.addEventListener(`error`, () => reject(new Error(`Failed to load mediafile from URL: ${url}`)));
-    image.src = url;
+    if (type === MediaFileType.IMG) {
+      const image = new Image();
+      image.addEventListener(`load`, () => resolve(image));
+      // For change image to noimage.png, when get 404 (in mediaFiles will get .size = {"width":0,"height":0})
+      image.addEventListener(`error`, () => resolve(image));
+      image.src = url;
+    } else {
+      const audio = new Audio();
+      audio.addEventListener(`loadeddata`, () => resolve(audio));
+      audio.addEventListener(`error`, () => reject(new Error(`Failed to load mediafile from URL: ${url}`)));
+      audio.src = url;
+    }
   });
 };
 
@@ -88,8 +96,19 @@ export default class Loader {
         return Object.keys(this.mediaFiles);
 
       })
-      .then((mediaFiles) => mediaFiles.map((mediaFile) => loadMediaFile(mediaFile)))
+      .then((mediaFiles) => mediaFiles.map((mediaFile) => loadMediaFile(mediaFile, this.mediaFiles[mediaFile].type)))
       .then((mediaPromises) => Promise.all(mediaPromises))
+      .then((mediaFiles) => {
+
+        mediaFiles.forEach((it) => {
+          this.mediaFiles[it.src][`mediafile`] = it;
+          if (this.mediaFiles[it.src].type === MediaFileType.IMG) {
+            this.mediaFiles[it.src][`size`] = {width: it.width, height: it.height};
+          }
+        });
+
+        return {screenplay: this.screenplay, images: this.images};
+      })
       .then(() => ({screenplay: this.screenplay, mediaFiles: this.mediaFiles}));
   }
 
