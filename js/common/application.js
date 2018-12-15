@@ -1,54 +1,61 @@
-// import GameModel from '../model/model.js';
+import GameModel from '../model/model.js';
+import WelcomeScreen from '../screen/welcome/welcome.js';
+import GameScreen from '../screen/game/game.js'
+import errorScreen from '../screen/error/error.js';;
 import Loader from './loader.js';
 
 const mainElement = document.querySelector(`.main`);
 
 const changeScreen = (wrapper, element) => {
   wrapper.innerHTML = ``;
-  // wrapper.appendChild(element);
-  wrapper.innerHTML = element;
+  wrapper.appendChild(element);
 };
 
 export default class Application {
 
   static start() {
-    /*
-    const intro = new IntroScreen();
-    const greeting = new GreetingScreen(this);
-    changeScreen(mainElement, intro.element, greeting.element);
-    */
+    const welcome = new WelcomeScreen(this, true);
+    changeScreen(mainElement, welcome.element);
 
-    changeScreen(mainElement, `Begin Loading`);
     Loader.loadData()
       .then((data) => {
         this.screenplay = data.screenplay;
         this.mediaFiles = data.mediaFiles;
       })
-      .then(() => Application.playGame())
+      .then(() => Application.hidePreloader(welcome))
       .catch((err) => Application.showError(err));
   }
 
-  static playGame() {
+  static hidePreloader(welcome) {
+    welcome.hidePreloader();
+  }
+
+  static showWelcome() {
+    const welcome = new WelcomeScreen(this, false);
+    changeScreen(mainElement, welcome.element);
+  }
+
+  static showGame() {
+    const model = new GameModel();
+    model.screenplay = this.screenplay;
+    model.mediaFiles = this.mediaFiles;
+
+    const game = new GameScreen(this, model);
+    changeScreen(mainElement, game.element);
+  }
+
+  static saveCurrentGameResults(answers, lives) {
     /*
-    const audios = Object.keys(this.mediaFiles);
-
-    var audio = new Audio(audios[0]);
-    audio.play();
+    Loader.saveResults({answers, lives}, playerName)
+      .then(() => Loader.loadResults(playerName))
+      .then((data) => Application.showStat(data, playerName))
+      .catch((err) => Application.showError(err));
     */
-
-
-    changeScreen(mainElement, `End Loading. screenplay length: ` + this.screenplay.length);
-    console.log(JSON.stringify(this.screenplay));
-
-    Object.keys(this.mediaFiles).forEach((url) => {
-      if (this.mediaFiles[url].type === `img`) {
-        console.log(`>> ` + url);
-        console.log(JSON.stringify(this.mediaFiles[url].size));
-      }
-    });
-
   }
   /*
+
+  JSON.stringify(currentScore)
+
   static showGreeting() {
     const greeting = new GreetingScreen(this);
     greeting.fadeIn();
@@ -69,12 +76,7 @@ export default class Application {
     changeScreen(mainElement, game.element);
   }
 
-  static saveCurrentGameResults(answers, lives, playerName) {
-    Loader.saveResults({answers, lives}, playerName)
-      .then(() => Loader.loadResults(playerName))
-      .then((data) => Application.showStat(data, playerName))
-      .catch((err) => Application.showError(err));
-  }
+
 
   static showStat(date) {
     const stat = statScreen(this, date);
@@ -82,7 +84,7 @@ export default class Application {
   }
   */
   static showError(err) {
-    changeScreen(mainElement, `showError: ` + err);
+    const errorModal = errorScreen(err);
+    changeScreen(mainElement, errorModal);
   }
-
 }

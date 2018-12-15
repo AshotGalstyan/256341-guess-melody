@@ -34,6 +34,14 @@ export const MediaFileType = {
   IMG: `img`
 };
 
+export const QUIZ_RESULTS = {
+  correct: {type: `correct`, points: 1},
+  fast: {type: `fast`, points: 2},
+  wrong: {type: `wrong`, points: 0},
+};
+
+
+
 /*
 export const LIVES_TO_POINT = 50;
 export const FAST_LIMIT = 20;
@@ -41,14 +49,9 @@ export const SLOW_LIMIT = 10;
 
 export const TOTAL_TITLE_FOR_FAILED = `fail`;
 
-export const QUIZ_RESULTS = {
-  incompleate: {type: `incompleate`, points: 0},
-  correct: {type: `correct`, points: 100},
-  fast: {type: `fast`, points: 150},
-  slow: {type: `slow`, points: 50},
-  wrong: {type: `wrong`, points: 0},
-  dead: {type: `dead`, points: 0}
-};
+
+
+
 
 export const STAT_INFO = {
   correct: {title: ``, bonus: QUIZ_RESULTS.correct.points},

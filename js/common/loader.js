@@ -96,6 +96,7 @@ export default class Loader {
         return Object.keys(this.mediaFiles);
 
       })
+      /*
       .then((mediaFiles) => mediaFiles.map((mediaFile) => loadMediaFile(mediaFile, this.mediaFiles[mediaFile].type)))
       .then((mediaPromises) => Promise.all(mediaPromises))
       .then((mediaFiles) => {
@@ -105,10 +106,12 @@ export default class Loader {
           if (this.mediaFiles[it.src].type === MediaFileType.IMG) {
             this.mediaFiles[it.src][`size`] = {width: it.width, height: it.height};
           }
-        });
+        })
+        ;
 
         return {screenplay: this.screenplay, images: this.images};
       })
+      */
       .then(() => ({screenplay: this.screenplay, mediaFiles: this.mediaFiles}));
   }
 

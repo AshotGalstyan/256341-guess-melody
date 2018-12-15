@@ -62,3 +62,45 @@
   @include list-unstyled;
   text-align: center;
 }
+
+.welcome__button-hide {
+  display: none;
+}
+
+/* Preloader */
+
+.welcome__preloader {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+
+  position: absolute;
+  left: 367px;
+  top: 467px;
+
+  &::after {
+    content: " ";
+    display: block;
+    width: 46px;
+    height: 46px;
+    margin: 1px;
+    border-radius: 50%;
+    border: 3px solid $color-orange;
+    border-color: $color-orange transparent $color-orange transparent;
+    animation: welcome__preloader-ring 1.2s linear infinite;
+  }
+}
+
+@keyframes welcome__preloader-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.welcome__preloader-hide {
+  display: none;
+}
