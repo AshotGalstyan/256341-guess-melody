@@ -2,12 +2,13 @@ import AbstractView from '../../common/abstract-view.js';
 
 export default class ArtistView extends AbstractView {
 
-  constructor(question, src, answers) {
+  constructor(nom, question, genre, answers) {
 
     super();
 
+    this.nom = nom;
     this.question = question;
-    this.src = src;
+    this.genre = genre;
     this.answers = answers;
   }
 
@@ -20,7 +21,7 @@ export default class ArtistView extends AbstractView {
 
   get template() {
     return `
-      <h2 class="game__title">${this.question}</h2>
+      <h2 class="game__title">#${this.nom} : ${this.question}</h2>
       <button class="xxx__btn--true">True</button>
       <button class="xxx__btn--false">False</button>
       `;
@@ -33,12 +34,12 @@ export default class ArtistView extends AbstractView {
 
       trueButton.addEventListener(`click`, function handleTrueButtonClick() {
         trueButton.removeEventListener(`click`, handleTrueButtonClick);
-        resolve(true);
+        resolve();
       });
 
       falseButton.addEventListener(`click`, function handleFalseButtonClick() {
         falseButton.removeEventListener(`click`, handleFalseButtonClick);
-        resolve(false);
+        reject();
       });
     });
   }

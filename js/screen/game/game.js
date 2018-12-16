@@ -5,10 +5,7 @@ import HeaderView from './header-view.js';
 import GenreView from './quest-genre-view.js';
 import ArtistView from './quest-artist-view.js';
 
-import {
-  MAX_TIME_LIMIT, FAST_ANSWER_LIMIT, CRITICAL_TIME,
-  QuestionType
-} from '../../common/constants.js';
+import {MAX_TIME_LIMIT, QuestionType} from '../../common/constants.js';
 
 export default class GameScreen {
 
@@ -21,7 +18,6 @@ export default class GameScreen {
     this.updateHeader();
     this.updateQuest();
 
-
     this.start();
   }
 
@@ -29,20 +25,54 @@ export default class GameScreen {
     return this.root;
   }
 
+  start() {
+    this.intervalId = this.getTimerId();
+  }
+
   updateHeader() {
 
     const timer = this.timer.getTime();
-    const header = new HeaderView(timer, this.model.getCurrentLives());
+    const header = new HeaderView(timer, this.model.wrongCount);
 
-    header.onClick = () => {
-      this.freezeTimer();
-      this.showModal();
-    };
+    header.getUserAction()
+      .then(() => {
+        this.freezeTimer();
+        this.showModal();
+      });
 
-    if (this.header) {
-      this.header.replaceChild(header.element, this.header);
+    if (this.root) {
+      this.root.replaceChild(header.element, this.header);
     }
+
     this.header = header.element;
+
+  }
+
+  updateQuest() {
+
+    this.model.stepBeginTime = this.timer.getTime();
+
+    const currentStep = this.model.screenplay[this.model.currentStep];
+
+    const quest = (currentStep.type === QuestionType.GENRE ?
+      new GenreView(this.model.currentStep, currentStep.question, currentStep.genre, currentStep.answers) :
+      new ArtistView(this.model.currentStep, currentStep.question, currentStep.src, currentStep.answers)
+    );
+
+    quest.getUserSelect()
+      .then(() => this.finishStep(this.model.stepBeginTime - this.timer.getTime()))
+      .catch(() => this.finishStep(-1));
+
+    const rootClass = (currentStep.type === QuestionType.GENRE ? `game--genre` : `game--artist`);
+    const rootOtherClass = (currentStep.type === QuestionType.GENRE ? `game--artist` : `game--genre`);
+
+    if (this.root) {
+      this.root.classList.replace(rootOtherClass, rootClass);
+      this.root.replaceChild(quest.element, this.quest);
+    } else {
+      this.root = render([this.header, quest.element], `section`, {class: `game ` + rootClass});
+    }
+    this.quest = quest.element;
   }
 
   getTimerId() {
@@ -56,51 +86,20 @@ export default class GameScreen {
   }
 
   freezeTimer() {
-    this._freezedTime = this.timer.getTime();
+    this.freezedTime = this.timer.getTime();
     clearInterval(this.intervalId);
   }
 
   unfreezeTimer() {
-    this.timer.setTime(this._freezedTime);
+    this.timer.setTime(this.freezedTime);
     this.intervalId = this.getTimerId();
-  }
-
-  start() {
-    this.intervalId = this.getTimerId();
-    this.root = render([this.header, this.quest]);
-  }
-
-
-  updateQuest() {
-
-    const currentStep = this.model.screenplay[this.model.getCurrentStep()];
-
-    const quest = (currentStep.type === QuestionType.GENRE ?
-      new GenreView(currentStep.question, currentStep.genre, currentStep.answers) :
-      new ArtistView(currentStep.question, currentStep.src, currentStep.answers)
-    );
-
-    this.questObject = quest;
-    quest.getUserSelect = (answer) => {
-      this.finishStep(answer, this.timer.getTime() - this.beginStep);
-    };
-
-    if (this.root) {
-      this.root.replaceChild(quest.element, this.quest);
-    } else {
-      this.root = render([this.header, quest.element]);
-    }
-    this.quest = quest.element;
-
-    this.beginStep = this.timer.getTime();
   }
 
   finishStep(result) {
 
     this.model.addAnswer(result);
 
-    if (this.model.canContinue()) {
-      this.updateTimer();
+    if (this.model.canContinue) {
       this.updateQuest();
     } else {
       this.finishGame();
@@ -108,7 +107,13 @@ export default class GameScreen {
   }
 
   finishGame() {
-    this.router.saveCurrentGameResults();
+
+    const totalTime = MAX_TIME_LIMIT - this.timer.getTime();
+
+    clearInterval(this.intervalId);
+    this.root.parentNode.removeChild(this.root);
+
+    this.router.saveCurrentGameResults(this.model.answers, totalTime);
   }
 
   showModal() {

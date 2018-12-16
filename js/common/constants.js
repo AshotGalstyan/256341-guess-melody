@@ -2,15 +2,19 @@ export const DEBUG = true;
 export const UPLOAD_ARTIST_THUMBNAIL = true;
 
 export const SERVER_URL = `https://es.dump.academy/guess-melody/`;
-export const DEFAULT_NAME = `assa`;
 export const APP_ID = 65873221162;
 
-export const MAX_LIVES = 3;
+export const MAX_WRONG = 3;
 export const TOTAL_STEPS = 10;
-export const MAX_TIME_LIMIT = 300;
+export const MAX_TIME_LIMIT = 35;
 export const CRITICAL_TIME = 30;
 export const FAST_ANSWER_LIMIT = 30;
-export const WRONG_ANSWER_PENALTY = 2;
+
+export const POINTS = {
+  fast: 2,
+  correct: 1,
+  wrong: -2
+};
 
 export const QuestionType = {
   GENRE: `genre`,
@@ -33,33 +37,3 @@ export const MediaFileType = {
   AUDIO: `audio`,
   IMG: `img`
 };
-
-export const QUIZ_RESULTS = {
-  correct: {type: `correct`, points: 1},
-  fast: {type: `fast`, points: 2},
-  wrong: {type: `wrong`, points: 0},
-};
-
-
-
-/*
-export const LIVES_TO_POINT = 50;
-export const FAST_LIMIT = 20;
-export const SLOW_LIMIT = 10;
-
-export const TOTAL_TITLE_FOR_FAILED = `fail`;
-
-
-
-
-
-export const STAT_INFO = {
-  correct: {title: ``, bonus: QUIZ_RESULTS.correct.points},
-  fast: {title: `Бонус за скорость:`, bonus: QUIZ_RESULTS.fast.points - QUIZ_RESULTS.correct.points},
-  lives: {title: `Бонус за жизни:`, bonus: LIVES_TO_POINT},
-  slow: {title: `Штраф за медлительность:`, bonus: QUIZ_RESULTS.slow.points - QUIZ_RESULTS.correct.points},
-  total: {title: ``}
-};
-*/
-
-

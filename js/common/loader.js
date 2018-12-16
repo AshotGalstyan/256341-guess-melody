@@ -1,5 +1,5 @@
 import {
-  SERVER_URL, DEFAULT_NAME, APP_ID,
+  SERVER_URL, APP_ID,
   QuestionType, MediaFileType, Genre,
   TOTAL_STEPS, UPLOAD_ARTIST_THUMBNAIL
 } from './constants.js';
@@ -60,10 +60,11 @@ const convertServerData = (data) => {
     }
   }
 
-  return {screenplay: data, mediaFiles: mediaFiles};
+  return {screenplay: data, mediaFiles};
 
 };
 
+/*
 const loadMediaFile = (url, type) => {
   return new Promise((resolve, reject) => {
     if (type === MediaFileType.IMG) {
@@ -80,6 +81,7 @@ const loadMediaFile = (url, type) => {
     }
   });
 };
+*/
 
 export default class Loader {
   static loadData() {
@@ -115,12 +117,11 @@ export default class Loader {
       .then(() => ({screenplay: this.screenplay, mediaFiles: this.mediaFiles}));
   }
 
-  static loadResults(name = DEFAULT_NAME) {
-    return fetch(`${SERVER_URL}/stats/${APP_ID}-${name}`).then(checkStatus).then(convertToJSON).then(sortResults);
+  static loadResults() {
+    return fetch(`${SERVER_URL}/stats/${APP_ID}`).then(checkStatus).then(convertToJSON).then(sortResults);
   }
 
-  static saveResults(data, name = DEFAULT_NAME) {
-    data = Object.assign({name}, data);
+  static saveResults(data) {
     const requestSettings = {
       body: JSON.stringify(data),
       headers: {
@@ -128,6 +129,6 @@ export default class Loader {
       },
       method: `POST`
     };
-    return fetch(`${SERVER_URL}/stats/${APP_ID}-${name}`, requestSettings).then(checkStatus);
+    return fetch(`${SERVER_URL}/stats/${APP_ID}`, requestSettings).then(checkStatus);
   }
 }

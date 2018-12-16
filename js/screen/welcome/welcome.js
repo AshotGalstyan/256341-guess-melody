@@ -2,21 +2,28 @@ import WelcomeView from './welcome-view.js';
 
 export default class WelcomeScreen {
 
-  constructor(router) {
+  constructor(router, withPreloader = false) {
 
-    this.root = new WelcomeView();
+    this._withPreloader = withPreloader;
 
-    this.root.onClick = () => {
-      this.root.unbind();
-      router.showGame();
-    };
+    const welcomeView = new WelcomeView(withPreloader);
+
+    this._view = welcomeView;
+    this._element = welcomeView.element;
+
+    welcomeView.getUserAction()
+      .then(() => {
+        router.showGame();
+      });
   }
 
   get element() {
-    return this.root.element;
+    return this._element;
   }
 
   hidePreloader() {
-    this.root.hidePreloader();
+    if (this._withPreloader) {
+      this._view.hidePreloader();
+    }
   }
 }

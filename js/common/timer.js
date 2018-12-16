@@ -1,29 +1,24 @@
 class Timer {
   constructor(time) {
-    this.time = time;
-    this._startTime = time;
+    this._time = time;
   }
 
   tick() {
-    if (!this.time) {
+    if (!this._time) {
       return `finished`;
     }
 
-    this.time--;
+    this._time--;
 
-    return this.time || `finished`;
-  }
-
-  reset() {
-    this.time = this._startTime;
+    return this._time || `finished`;
   }
 
   getTime() {
-    return this.time;
+    return this._time;
   }
 
   setTime(time) {
-    this.time = time;
+    this._time = time;
   }
 }
 

@@ -1,6 +1,15 @@
 import AbstractView from '../../common/abstract-view.js';
 
-export default class IntroView extends AbstractView {
+export default class WelcomeView extends AbstractView {
+
+  constructor(withPreloader) {
+
+    super();
+
+    this.preloader = (withPreloader ? `<div class="welcome__preloader"></div>` : ``);
+    this.additionalClass = (withPreloader ? `welcome__button-hide` : ``);
+
+  }
 
   get wrapperTag() {
     return `section`;
@@ -13,8 +22,8 @@ export default class IntroView extends AbstractView {
   get template() {
     return `
       <div class="welcome__logo"><img src="img/melody-logo.png" alt="Угадай мелодию" width="186" height="83"></div>
-      <div class="welcome__preloader"></div>
-      <button class="welcome__button welcome__button-hide"><span class="visually-hidden">Начать игру</span></button>
+      ${this.preloader}
+      <button class="welcome__button ${this.additionalClass}"><span class="visually-hidden">Начать игру</span></button>
       <h2 class="welcome__rules-title">Правила игры</h2>
       <p class="welcome__text">Правила просты:</p>
       <ul class="welcome__rules-list">
@@ -25,20 +34,22 @@ export default class IntroView extends AbstractView {
     `;
   }
 
-  bind() {
-    this.preloader = this.element.querySelector(`.welcome__preloader`);
-    this.nextButton = this.element.querySelector(`.welcome__button`);
-    this.nextButton.addEventListener(`click`, this.onClick);
-  }
+  getUserAction() {
+    return new Promise((resolve) => {
+      const nextButton = this.element.querySelector(`.welcome__button`);
 
-  unbind() {
-    this.nextButton.removeEventListener(`click`, this.onClick);
+      nextButton.addEventListener(`click`, function handleNextButtonClick() {
+        nextButton.removeEventListener(`click`, handleNextButtonClick);
+        resolve();
+      });
+    });
   }
-
-  onClick() {}
 
   hidePreloader() {
-    this.nextButton.classList.remove(`welcome__button-hide`);
-    this.preloader.classList.add(`welcome__preloader-hide`);
+    const preloader = this.element.querySelector(`.welcome__preloader`);
+    const nextButton = this.element.querySelector(`.welcome__button`);
+
+    nextButton.classList.remove(`welcome__button-hide`);
+    preloader.classList.add(`welcome__preloader-hide`);
   }
 }
