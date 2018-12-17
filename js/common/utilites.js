@@ -1,5 +1,31 @@
 import {POINTS, FAST_ANSWER_LIMIT, TOTAL_STEPS} from './constants.js';
 
+export const getRadius = (ratio, radius) => {
+
+  const stroke = Math.round(2 * Math.PI * radius);
+  const offset = stroke - Math.round(stroke * ratio);
+
+  return {
+    stroke,
+    offset,
+  };
+};
+
+export const compareScores = (lastScore, otherScores) => {
+
+  let message = `Вы заняли последнее место из ${(otherScores.length + 1)} игроков. Это худший результат.`;
+
+  for (let i = 0; i < otherScores.length; i++) {
+    if (lastScore > otherScores[i]) {
+      message = `Вы заняли ${i + 1} место из ${(otherScores.length + 1)} игроков. Это лучше, чем у ${Math.floor(100 * (otherScores.length - i) / (otherScores.length + 1))}% игроков.`;
+      break;
+    }
+  }
+
+  return message;
+
+};
+
 export const getScore = (answers) => {
 
   if (!(answers instanceof Array)) {
@@ -33,7 +59,7 @@ export const groupAnswers = (answers) => {
 
 };
 
-export const resultsToText = (time, score, fastCount, wrongCount) => {
+export const timeToText = (time) => {
 
   const minutes = Math.floor(time / 60);
   const seconds = time - minutes * 60;
@@ -41,17 +67,18 @@ export const resultsToText = (time, score, fastCount, wrongCount) => {
   const textAnd = (minutes > 0 && seconds > 0 ? ` и ` : ``);
   const textMinutes = (minutes > 0 ? declinationOfNumber(minutes, [`минуту`, `минуты`, `минут`]) : ``);
   const textSeconds = (seconds > 0 ? declinationOfNumber(seconds, [`секунду`, `секунды`, `секунд`]) : ``);
-  const textScore = declinationOfNumber(score, [`балл`, `балла`, `баллов`]);
-  const textFast = declinationOfNumber(fastCount, [`быстрый`, `быстрых`, `быстрых`]);
-  const textWrong = declinationOfNumber(wrongCount, [`ошибку`, `ошибки`, `ошибок`]);
 
-  return `За ${textMinutes}${textAnd}${textSeconds} вы набрали ${textScore} (${textFast}), совершив ${textWrong}`;
+  return textMinutes + textAnd + textSeconds;
 
 };
 
-export const declinationOfNumber = (number, titles) => {
+export const scoreToText = (score) => declinationOfNumber(score, [`балл`, `балла`, `баллов`]);
 
-  // https://punbbinfo.000webhostapp.com/t-287.html
+export const fastCountToText = (fastCount) => declinationOfNumber(fastCount, [`быстрый`, `быстрых`, `быстрых`]);
+
+export const wrongCountToText = (wrongCount) => declinationOfNumber(wrongCount, [`ошибку`, `ошибки`, `ошибок`]);
+
+export const declinationOfNumber = (number, titles) => {
 
   const cases = [2, 0, 1, 1, 1, 2];
 
@@ -63,7 +90,7 @@ export const declinationOfNumber = (number, titles) => {
     return number + ` ` + titles[cases[number % 10]];
   }
 
-  return number + ` ` + titles[5];
+  return number + ` ` + titles[2];
 
 };
 

@@ -1,18 +1,6 @@
 import AbstractView from '../../common/abstract-view.js';
-import {CRITICAL_TIME, MAX_TIME_LIMIT} from '../../common/constants.js';
-
-const RADIUS = 370;
-
-const getRadius = (ratio, radius) => {
-
-  const stroke = Math.round(2 * Math.PI * radius);
-  const offset = stroke - Math.round(stroke * ratio);
-
-  return {
-    stroke,
-    offset,
-  };
-};
+import {getRadius} from '../../common/utilites.js';
+import {CRITICAL_TIME, MAX_TIME_LIMIT, RADIUS} from '../../common/constants.js';
 
 export default class HeaderView extends AbstractView {
 

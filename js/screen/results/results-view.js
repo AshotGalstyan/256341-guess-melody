@@ -1,5 +1,5 @@
 import AbstractView from '../../common/abstract-view.js';
-import {getScore, groupAnswers, resultsToText} from '../../common/utilites.js';
+import {getScore, groupAnswers, timeToText, scoreToText, fastCountToText, wrongCountToText, compareScores} from '../../common/utilites.js';
 import {MAX_TIME_LIMIT, TOTAL_STEPS} from '../../common/constants.js';
 
 export default class ResultsView extends AbstractView {
@@ -10,10 +10,14 @@ export default class ResultsView extends AbstractView {
 
     this.data = data;
 
-    const lastTime = data[0].time;
-    const lastAnswers = data[0].answers;
+    const [last, ...others] = this.data;
+
+    const lastTime = last.time;
+    const lastAnswers = last.answers;
     const lastScore = getScore(lastAnswers);
     const lastGroupAnswers = groupAnswers(lastAnswers);
+
+    const otherScores = others.map((el) => getScore(el.answers)).sort((a, b) => b - a);
 
     if (lastTime === MAX_TIME_LIMIT && lastAnswers.length < TOTAL_STEPS) {
 
@@ -29,8 +33,8 @@ export default class ResultsView extends AbstractView {
 
       this.title = `Вы настоящий меломан!`;
       this.description = `
-      <p class="result__total">${resultsToText(lastTime, lastScore, lastGroupAnswers.fast, lastGroupAnswers.wrong)}</p>
-      <p class="result__text">Вы заняли 2 место из 10. Это лучше чем у 80% игроков</p>
+      <p class="result__total">За ${timeToText(lastTime)} вы набрали ${scoreToText(lastScore)} (${fastCountToText(lastGroupAnswers.fast)}), совершив ${wrongCountToText(lastGroupAnswers.wrong)}</p>
+      <p class="result__text">${compareScores(lastScore, otherScores)}</p>
       `;
     }
   }
@@ -48,7 +52,6 @@ export default class ResultsView extends AbstractView {
       <div class="result__logo"><img src="img/melody-logo.png" alt="Угадай мелодию" width="186" height="83"></div>
       <h2 class="result__title">${this.title}</h2>
       ${this.description}
-      ${this.data[0].time + ` ` + JSON.stringify(this.data[0].answers)}
       <button class="result__replay" type="button">Сыграть ещё раз</button>
     `;
   }
