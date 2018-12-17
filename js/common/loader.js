@@ -48,6 +48,9 @@ const convertServerData = (data) => {
         }
         mediaFiles[answer.src] = {type: MediaFileType.AUDIO};
       }
+
+      step.trueAnswers = step.answers.filter((el) => el.genre === step.genre).map((el) => el.src);
+
     } else {
 
       mediaFiles[step.src] = {type: MediaFileType.AUDIO};
@@ -57,6 +60,9 @@ const convertServerData = (data) => {
           mediaFiles[answer.image.url] = {type: MediaFileType.IMG};
         }
       }
+
+      step.trueAnswers = step.answers.filter((el) => el.isCorrect).map((el) => el.image.url);
+
     }
   }
 
