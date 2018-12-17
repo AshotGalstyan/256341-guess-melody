@@ -97,6 +97,10 @@
   cursor: pointer;
 }
 
+.game__check--true {
+  background-position: -5px -64px;
+}
+
 .game__input:checked + .game__check {
   background-position: -5px -5px;
 }
@@ -107,10 +111,15 @@
 
 .game__submit {
   @include italic-text;
-  margin-top: 30px;
+  margin-top: 0;  //30px
   padding: 5px 20px;
 
+  color: $color-text-dark;
   font-size: 24px;
+
+  &:disabled {
+    color: #dddddd;
+  }
 }
 
 // Стили для игры на выбор исполнителя
@@ -141,6 +150,7 @@
 }
 
 .game__artist {
+  margin-top: -50px;
   display: flex;
   justify-content: space-between;
 }

@@ -1,7 +1,7 @@
 import {
   SERVER_URL, APP_ID,
   QuestionType, MediaFileType, Genre,
-  TOTAL_STEPS, UPLOAD_ARTIST_THUMBNAIL
+  TOTAL_STEPS, UPLOAD_ARTIST_THUMBNAIL, NOIMAGE
 } from './constants.js';
 
 const checkStatus = (response) => {
@@ -70,7 +70,6 @@ const convertServerData = (data) => {
 
 };
 
-/*
 const loadMediaFile = (url, type) => {
   return new Promise((resolve, reject) => {
     if (type === MediaFileType.IMG) {
@@ -87,7 +86,6 @@ const loadMediaFile = (url, type) => {
     }
   });
 };
-*/
 
 export default class Loader {
   static loadData() {
@@ -104,23 +102,34 @@ export default class Loader {
         return Object.keys(this.mediaFiles);
 
       })
-      /*
       .then((mediaFiles) => mediaFiles.map((mediaFile) => loadMediaFile(mediaFile, this.mediaFiles[mediaFile].type)))
       .then((mediaPromises) => Promise.all(mediaPromises))
       .then((mediaFiles) => {
 
         mediaFiles.forEach((it) => {
-          this.mediaFiles[it.src][`mediafile`] = it;
           if (this.mediaFiles[it.src].type === MediaFileType.IMG) {
             this.mediaFiles[it.src][`size`] = {width: it.width, height: it.height};
           }
-        })
-        ;
-
-        return {screenplay: this.screenplay, images: this.images};
+        });
+        return {screenplay: this.screenplay, mediaFiles: this.mediaFiles};
       })
-      */
-      .then(() => ({screenplay: this.screenplay, mediaFiles: this.mediaFiles}));
+      .then(() => {
+        for (const step of this.screenplay) {
+          if (step.type === `artist`) {
+            for (const answer of step.answers) {
+              if (this.mediaFiles[answer.image.url].size.width === 0) {
+                // Thumbnail with 404 response
+                const index = step.trueAnswers.indexOf(answer.image.url);
+                if (index > -1) {
+                  step.trueAnswers[index] = NOIMAGE.src;
+                }
+                answer.image.url = NOIMAGE.src;
+              }
+            }
+          }
+        }
+        return {screenplay: this.screenplay, mediaFiles: this.mediaFiles};
+      });
   }
 
   static loadResults() {

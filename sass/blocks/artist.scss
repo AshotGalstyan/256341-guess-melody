@@ -25,6 +25,10 @@
   border: solid 5px $color-text-dark;
   border-radius: 134px;
   cursor: pointer;
+
+  &--true {
+    border: solid 5px $color-correct;
+  }
 }
 
 .artist:hover .artist__picture,

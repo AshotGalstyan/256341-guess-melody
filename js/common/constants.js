@@ -12,6 +12,11 @@ export const MAX_TIME_LIMIT = 300;
 export const CRITICAL_TIME = 30;
 export const FAST_ANSWER_LIMIT = 30;
 
+export const NOIMAGE = {
+  src: `/img/noimage.png`,
+  size: {width: 300, height: 300}
+};
+
 export const POINTS = {
   fast: 2,
   correct: 1,

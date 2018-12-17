@@ -55,8 +55,8 @@ export default class GameScreen {
     const currentStep = this.model.screenplay[this.model.currentStep];
 
     const quest = (currentStep.type === QuestionType.GENRE ?
-      new GenreView(this.model.currentStep, currentStep.question, currentStep.genre, currentStep.answers) :
-      new ArtistView(this.model.currentStep, currentStep.question, currentStep.src, currentStep.answers)
+      new GenreView(this.model.currentStep + 1, currentStep.question, currentStep.genre, currentStep.answers, currentStep.trueAnswers, this.model.mediaFiles) :
+      new ArtistView(this.model.currentStep + 1, currentStep.question, currentStep.src, currentStep.answers, currentStep.trueAnswers, this.model.mediaFiles)
     );
 
     quest.getUserSelect()
