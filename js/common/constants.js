@@ -1,5 +1,5 @@
 export const DEBUG = true;
-export const DOWNLOAD_MEDIAFILES = false;
+export const DOWNLOAD_MEDIAFILES = true;
 export const DOWNLOAD_ARTIST_THUMBNAIL = true;
 
 export const SERVER_URL = `https://es.dump.academy/guess-melody/`;

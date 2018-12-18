@@ -25,6 +25,9 @@ const evaluateСhoice = (evt) => {
     el.removeEventListener(`click`, evaluateСhoice);
   });
 
+  const trackButton = evt.target.parameters.trackButton;
+  trackButton.removeEventListener(`click`, playStopAudio);
+
   const selectedThumbnail = context.element.querySelector(`#${evt.target.id.replace(`img-`, `answer-`)}`).value;
   const trueAnswers = context.trueAnswers;
 
@@ -81,15 +84,16 @@ export default class ArtistView extends AbstractView {
 
   getUserSelect() {
     return new Promise((resolve, reject) => {
-      const thumbnails = this.element.querySelectorAll(`.artist__picture`);
-      thumbnails.forEach((el) => {
-        el.addEventListener(`click`, evaluateСhoice);
-        el.parameters = {context: this, resolve, reject};
-      });
 
       const trackButton = this.element.querySelector(`.track__button`);
       trackButton.addEventListener(`click`, playStopAudio);
       trackButton.parameters = {context: this};
+
+      const thumbnails = this.element.querySelectorAll(`.artist__picture`);
+      thumbnails.forEach((el) => {
+        el.addEventListener(`click`, evaluateСhoice);
+        el.parameters = {context: this, trackButton, resolve, reject};
+      });
     });
   }
 }

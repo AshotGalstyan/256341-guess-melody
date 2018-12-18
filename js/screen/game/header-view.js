@@ -15,9 +15,9 @@ export default class HeaderView extends AbstractView {
     this._timerTabloClass = (timer < CRITICAL_TIME ? ` timer__value--finished` : ``);
 
     this._timerTablo = `
-      <span class="timer__mins">${(minutes < 10 ? `0` + minutes : minutes)}</span>
+      <span class="timer__mins">${(minutes < 10 ? `0${minutes}` : minutes)}</span>
       <span class="timer__dots">:</span>
-      <span class="timer__secs">${(seconds < 10 ? `0` + seconds : seconds)}</span>
+      <span class="timer__secs">${(seconds < 10 ? `0${seconds}` : seconds)}</span>
     `;
     this._radius = getRadius(timer / MAX_TIME_LIMIT, RADIUS);
 

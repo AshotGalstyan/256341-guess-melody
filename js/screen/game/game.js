@@ -70,7 +70,7 @@ export default class GameScreen {
       this.root.classList.replace(rootOtherClass, rootClass);
       this.root.replaceChild(quest.element, this.quest);
     } else {
-      this.root = render([this.header, quest.element], `section`, {class: `game ` + rootClass});
+      this.root = render([this.header, quest.element], `section`, {class: `game ${rootClass}`});
     }
     this.quest = quest.element;
   }

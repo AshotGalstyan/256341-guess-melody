@@ -13,7 +13,7 @@ const playStopAudio = (evt) => {
     allAudios.forEach((el) => {
       if (!el.paused) {
         const playedId = el.id.substr(6);
-        const playedButton = context.querySelector(`#control-` + playedId);
+        const playedButton = context.querySelector(`#control-${playedId}`);
         playedButton.classList.replace(`track__button--pause`, `track__button--play`);
         el.pause();
       }
@@ -42,6 +42,9 @@ const handleSubmitButtonClick = (evt) => {
 
   const checkboxes = evt.target.parameters.checkboxes;
   checkboxes.forEach((el) => el.removeEventListener(`click`, activateSubmitButton));
+
+  const trackButtons = evt.target.parameters.trackButtons;
+  trackButtons.forEach((el) => el.removeEventListener(`click`, playStopAudio));
 
   const context = evt.target.parameters.context;
   const trueAnswers = context.trueAnswers;
@@ -112,7 +115,7 @@ export default class GenreView extends AbstractView {
       });
 
       submitButton.addEventListener(`click`, handleSubmitButtonClick);
-      submitButton.parameters = {context: this, checkboxes, resolve, reject};
+      submitButton.parameters = {context: this, checkboxes, trackButtons, resolve, reject};
     });
   }
 }
