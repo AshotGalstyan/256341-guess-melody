@@ -83,14 +83,14 @@ export const declinationOfNumber = (number, titles) => {
   const cases = [2, 0, 1, 1, 1, 2];
 
   if (number % 100 > 4 && number % 100 < 20) {
-    return `${number} ${titles[2]}`;
+    return number + ` ` + titles[2];
   }
 
   if (number % 10 < 5) {
-    return `${number} ${titles[cases[number % 10]]}`;
+    return number + ` ` + titles[cases[number % 10]];
   }
 
-  return `${number} ${titles[2]}`;
+  return number + ` ` + titles[2];
 
 };
 
