@@ -13,11 +13,11 @@ export const getRadius = (ratio, radius) => {
 
 export const compareScores = (lastScore, otherScores) => {
 
-  let message = `Вы заняли последнее место из ${(otherScores.length + 1)} игроков. Это худший результат.`;
+  let message = `Вы заняли последнее место из ${(otherScores.length + 1)} игроков.<br>Это худший результат.`;
 
   for (let i = 0; i < otherScores.length; i++) {
     if (lastScore > otherScores[i]) {
-      message = `Вы заняли ${i + 1} место из ${(otherScores.length + 1)} игроков. Это лучше, чем у ${Math.floor(100 * (otherScores.length - i) / (otherScores.length + 1))}% игроков.`;
+      message = `Вы заняли ${i + 1} место из ${(otherScores.length + 1)} игроков.<br>Это лучше, чем у ${Math.floor(100 * (otherScores.length - i) / (otherScores.length + 1))}% игроков.`;
       break;
     }
   }

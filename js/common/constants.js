@@ -1,5 +1,6 @@
 export const DEBUG = true;
-export const UPLOAD_ARTIST_THUMBNAIL = true;
+export const DOWNLOAD_MEDIAFILES = false;
+export const DOWNLOAD_ARTIST_THUMBNAIL = true;
 
 export const SERVER_URL = `https://es.dump.academy/guess-melody/`;
 export const APP_ID = 65873221162;

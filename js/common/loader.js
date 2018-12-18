@@ -1,7 +1,7 @@
 import {
   SERVER_URL, APP_ID,
   QuestionType, MediaFileType, Genre,
-  TOTAL_STEPS, UPLOAD_ARTIST_THUMBNAIL, NOIMAGE
+  TOTAL_STEPS, DOWNLOAD_MEDIAFILES, DOWNLOAD_ARTIST_THUMBNAIL, NOIMAGE
 } from './constants.js';
 
 const checkStatus = (response) => {
@@ -55,7 +55,7 @@ const convertServerData = (data) => {
 
       mediaFiles[step.src] = {type: MediaFileType.AUDIO};
 
-      if (UPLOAD_ARTIST_THUMBNAIL) {
+      if (DOWNLOAD_ARTIST_THUMBNAIL) {
         for (const answer of step.answers) {
           mediaFiles[answer.image.url] = {type: MediaFileType.IMG};
         }
@@ -72,64 +72,84 @@ const convertServerData = (data) => {
 
 const loadMediaFile = (url, type) => {
   return new Promise((resolve, reject) => {
-    if (type === MediaFileType.IMG) {
-      const image = new Image();
-      image.addEventListener(`load`, () => resolve(image));
-      // For change image to noimage.png, when get 404 (in mediaFiles will get .size = {"width":0,"height":0})
-      image.addEventListener(`error`, () => resolve(image));
-      image.src = url;
+
+    if (DOWNLOAD_MEDIAFILES) {
+      if (type === MediaFileType.IMG) {
+        const image = new Image();
+        image.addEventListener(`load`, () => resolve(image));
+        // For change image to noimage.png, when get 404 (in mediaFiles will get .size = {"width":0,"height":0})
+        image.addEventListener(`error`, () => resolve(image));
+        image.src = url;
+      } else {
+        const audio = new Audio();
+        audio.addEventListener(`loadeddata`, () => resolve(audio));
+        audio.addEventListener(`error`, () => reject(new Error(`Failed to load mediafile from URL: ${url}`)));
+        audio.src = url;
+      }
     } else {
-      const audio = new Audio();
-      audio.addEventListener(`loadeddata`, () => resolve(audio));
-      audio.addEventListener(`error`, () => reject(new Error(`Failed to load mediafile from URL: ${url}`)));
-      audio.src = url;
+      resolve(null);
     }
   });
 };
+
+const saveServerData = (data, context) => {
+
+  const temporary = convertServerData(data);
+
+  context.mediaFiles = temporary.mediaFiles;
+  context.screenplay = temporary.screenplay;
+
+  return Object.keys(context.mediaFiles);
+
+};
+
+const storeMediaFilesIntoDOMObjects = (mediaFiles, context) => {
+
+  if (DOWNLOAD_MEDIAFILES) {
+    mediaFiles.forEach((it) => {
+      context.mediaFiles[it.src][`mediafile`] = it;
+      if (context.mediaFiles[it.src].type === MediaFileType.IMG) {
+        context.mediaFiles[it.src][`size`] = {width: it.width, height: it.height};
+      }
+    });
+  }
+  return {screenplay: context.screenplay, mediaFiles: context.mediaFiles};
+};
+
+const changeBadImagesWithNOIMAGE = (context) => {
+
+  if (DOWNLOAD_MEDIAFILES) {
+    for (const step of context.screenplay) {
+      if (step.type === `artist`) {
+        for (const answer of step.answers) {
+          if (context.mediaFiles[answer.image.url].size.width === 0) {
+            // Thumbnail with 404 response
+            const index = step.trueAnswers.indexOf(answer.image.url);
+            if (index > -1) {
+              step.trueAnswers[index] = NOIMAGE.src;
+            }
+            answer.image.url = NOIMAGE.src;
+          }
+        }
+      }
+    }
+  }
+
+  return {screenplay: context.screenplay, mediaFiles: context.mediaFiles};
+
+};
+
 
 export default class Loader {
   static loadData() {
     return fetch(`${SERVER_URL}questions`)
       .then(checkStatus)
       .then((response) => response.json())
-      .then((data) => {
-
-        const temporary = convertServerData(data);
-
-        this.mediaFiles = temporary.mediaFiles;
-        this.screenplay = temporary.screenplay;
-
-        return Object.keys(this.mediaFiles);
-
-      })
+      .then((data) => saveServerData(data, this))
       .then((mediaFiles) => mediaFiles.map((mediaFile) => loadMediaFile(mediaFile, this.mediaFiles[mediaFile].type)))
       .then((mediaPromises) => Promise.all(mediaPromises))
-      .then((mediaFiles) => {
-
-        mediaFiles.forEach((it) => {
-          if (this.mediaFiles[it.src].type === MediaFileType.IMG) {
-            this.mediaFiles[it.src][`size`] = {width: it.width, height: it.height};
-          }
-        });
-        return {screenplay: this.screenplay, mediaFiles: this.mediaFiles};
-      })
-      .then(() => {
-        for (const step of this.screenplay) {
-          if (step.type === `artist`) {
-            for (const answer of step.answers) {
-              if (this.mediaFiles[answer.image.url].size.width === 0) {
-                // Thumbnail with 404 response
-                const index = step.trueAnswers.indexOf(answer.image.url);
-                if (index > -1) {
-                  step.trueAnswers[index] = NOIMAGE.src;
-                }
-                answer.image.url = NOIMAGE.src;
-              }
-            }
-          }
-        }
-        return {screenplay: this.screenplay, mediaFiles: this.mediaFiles};
-      });
+      .then((mediaFiles) => storeMediaFilesIntoDOMObjects(mediaFiles, this))
+      .then(() => changeBadImagesWithNOIMAGE(this));
   }
 
   static loadResults() {
